@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+        <title>Fetch and Graph CSV</title>
+    </head>
+    <body>
+        <script>
+            // Data from: https://data.giss.nasa.gov/gistemp/
+            // Mean from: https://earthobservatory.nasa.gov/world-of-change/DecadalTemp
+
+            getData();
+
+            async function getData(){
+                const response = await fetch('ZonAnn.Ts+dSST.csv')
+                const data = await response.text();
+                
+                const table = data.split("\n").slice(1);
+                table.forEach(row =>{
+                    const table = row.split(",");
+                    const year = table[0];
+                    const temp = table[1];
+                    console.log(year, temp);
+                });
+            }
+
+        </script>
+    </body>
+</html>

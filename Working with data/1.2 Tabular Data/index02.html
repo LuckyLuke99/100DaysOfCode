@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+        <title>Fetch and Graph CSV</title>
+    </head>
+    <body>
+        <script>
+            // This is a exercise for testing if I know how to use a csv file
+            // This is an exercise to test if I know how to work with the csv file
+            getData();
+
+            async function getData(){
+                const response = await fetch('test02.csv')
+                const data = await response.text();
+                
+                const table = data.split("\n").slice(1);
+                table.forEach(row =>{
+                    const table = row.split(',');
+                    const name = table[4];
+                    const qt = table[5];
+                    console.log(name, qt);
+            });
+        }
+        </script>
+    </body>
+</html>

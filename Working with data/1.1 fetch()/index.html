@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta http-equiv="X-UA-Compatible" content="ie=edge"/>  
+        <title>Coding Train: Data/APIs 1</title>
+    </head>
+    <body>
+        <h1>Fetch Rainbow</h1>
+        <script>
+            const rainbows = [
+                "rainbow01.jpg",
+                "rainbow02.jpg",
+                "rainbow03.jpg"
+            ];
+            cathRainbow (rainbows)
+            .then(response =>{
+                console.log("yay");
+            })
+            .catch(error =>{
+                console.log("error!!");
+                console.error(error);
+            });
+
+            async function cathRainbow (rainbows){
+                for (let filename of rainbows){
+                    const response = await fetch  (filename);
+                    const blob = await response.blob();
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(blob);
+                    img.width = "400";
+                    document.body.append(img);
+                }
+            }
+        </script>
+
+        <!-- Tentando fazer o fetch em um arquivo de texto (não consegui nem começar a fazer, peguei a solução dele) -->
+        <h1>Fetch a Poem</h1>
+        <p id="poem"/>
+        <script>
+            console.log('about to fetch a poem');
+            catchPoem()
+             .then(poem => {
+                 document.getElementById('poem').innerText = poem;
+             })
+             .catch(error => {
+                 console.log('Error!!');
+                 console.error(error);
+             })
+
+            async function catchPoem(){
+                const response = await fetch("sitesRecomendados.txt");
+                return await response.text();
+            }
+        </script>
+    </body>
+</html>
