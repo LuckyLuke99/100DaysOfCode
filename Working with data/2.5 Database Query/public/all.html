@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>        
+        <meta charset="UTF-8">
+        <meta name='viewport' content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>All html</title>
+    </head>
+    <body>
+        <h1>All HTML</h1>
+        
+        <script>
+            getData();
+            async function getData(){
+                const response = await fetch('/api');
+                const data = await response.json();
+
+                for (item of data){
+                    const root = document.createElement('div');
+                    const adress = document.createElement('div');
+                    const geo = document.createElement('div');
+                    const date = document.createElement('div');
+                    
+                    adress.textContent = `adress: ${item.adress}`;
+                    geo.textContent = `${item.lat}°, ${item.lon}°`;
+                    const dateString = new Date(item.timestamp).toLocaleString();
+                    date.textContent = dateString;
+
+                    root.append(adress, geo, date);
+                    document.body.append(root);
+                }
+            }
+        </script>
+    </body>
+</html>

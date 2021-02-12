@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+        <title>Selfie App</title>
+
+        <!-- Leaflet's CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin=""/>
+
+        <!-- Make sure you put this AFTER Leaflet's CSS -->
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+
+        <style>
+            #Map{
+                height: 250px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Find your location</h1>
+        <p>
+            latitude: <span id="latitude"></span>°</br>
+            longitude: <span id="longitude"></span>°
+
+        </p>
+        <label for="adress">Enter the name of adress:</label>
+        <input id="adress" value=""/>
+        <button id="findMe">Find me.</button>
+
+        <div id="Map"></div>    
+        <script>
+            document.getElementById('findMe').addEventListener('click', event =>{
+                //Getting the name adress
+                const adress = document.getElementById('adress').value;
+                //Making a map and tiles
+                const mymap = L.map('Map').setView([0, 0], 12);
+                const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+                const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+                const tiles = L.tileLayer(tileUrl, { attribution });
+                tiles.addTo(mymap);
+                //Making the marker
+                const marker = L.marker([0, 0]).addTo(mymap);
+                //Getting the location
+                if('geolocation' in navigator) {
+                    console.log("Geolocation is avaliable");
+                    navigator.geolocation.getCurrentPosition(async (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+    
+                        //Changing the marker position and the view of the map
+                        marker.setLatLng([lat, lon]);
+                        mymap.setView([lat, lon]);
+    
+                        document.getElementById('latitude').textContent = lat;
+                        document.getElementById('longitude').textContent = lon;
+                        console.log(position);
+
+                        //Fetch the data
+                        const data = {adress, lat, lon};
+                        const options = {
+                            method:'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        };
+                        const response = await fetch('/api', options);
+                        const json = await response.json();
+                        console.log(json);
+                    });
+                } else {
+                    console.log("Geolocation is not avaliable");
+                }
+            },  {once:true});            
+        </script>
+    </body>
+</html>
