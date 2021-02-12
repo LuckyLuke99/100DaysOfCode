@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+        <title>Selfie App</title>
+
+        <!-- Leaflet's CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin=""/>
+
+        <!-- Make sure you put this AFTER Leaflet's CSS -->
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+
+        <!-- P5.js script -->
+        <script src="https://cdn.jsdelivr.net/npm/p5@0.8.0/lib/p5.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/p5@0.8.0/lib/addons/p5.dom.js"></script>
+
+        <style rel="stylesheet" type="text/css" href="style.css"></style>
+    </head>
+    <body>
+        <h1>Find your location</h1>
+        <p>
+            latitude: <span id="latitude"></span>°</br>
+            longitude: <span id="longitude"></span>°
+
+        </p>
+        <label for="adress">Enter the name of adress:</label>
+        <input id="adress" value=""/>
+        <button id="findMe">Find me.</button>
+
+        <div id="Map"></div>
+        <script src="sketch.js"></script> 
+    </body>
+</html>
