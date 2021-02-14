@@ -1,0 +1,9 @@
+#Map{
+    height: 250px;
+}
+
+p {
+    border:2px solid rgb(48, 48, 48);
+    padding: 10px;
+    background-color: rgb(89, 228, 135);
+}
