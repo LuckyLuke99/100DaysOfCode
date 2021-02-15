@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+        <title>The Weather Here</title>
+
+        <!-- P5.js script -->
+        <script src="https://cdn.jsdelivr.net/npm/p5@0.8.0/lib/p5.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/p5@0.8.0/lib/addons/p5.dom.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="style.css"></style>
+    </head>
+    <body>
+        <h1>The Weather Here</h1>
+        <div>
+            <a href="/">check in</a> | <a href="/checkins">view checkins</a>
+        </div>
+        <p>
+            <span id="latitude"></span>°, <span id="longitude"></span>°<br>
+            The weather here is <span id="summary"></span> with a temperature of <span id="temperature"></span>°C.<br>
+            The concentration of particulate matter <span id="aq_parameter"></span> 
+            is <span id="aq_value"></span> <span id="aq_units"></span> last read 
+            on <span id="aq_date"></span>.
+        </p>
+        <button id="checkin">Check in</button>
+        <!-- <div id="Map"></div> -->
+        <script src="sketch.js"></script> 
+    </body>
+</html>

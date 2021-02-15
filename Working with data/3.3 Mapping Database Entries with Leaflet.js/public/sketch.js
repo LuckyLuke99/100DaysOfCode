@@ -13,12 +13,13 @@ function setup(){
         if('geolocation' in navigator) {
             console.log("Geolocation is avaliable");
             navigator.geolocation.getCurrentPosition(async (position) => {
+                let lat, lon, weather_data, air;
                 try{
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
+                lat = position.coords.latitude;
+                lon = position.coords.longitude;
 
                 //Changing the marker position and the view of the map
-/*                 marker.setLatLng([lat, lon]);
+/*              marker.setLatLng([lat, lon]);
                 mymap.setView([lat, lon]); */
 
                 document.getElementById('latitude').textContent = lat;
@@ -29,45 +30,42 @@ function setup(){
                 const response = await fetch(api_url);
                 const json = await response.json();
 
-                const {air_quality, weather_data} = json;
-                const {name, timezone, weather, main} = weather_data;
-                const {feels_like, humidity, temp, temp_max, temp_min} = main;
-                const air = air_quality.results[0].measurements[0];
-
+                const {air_quality} = json;
+                weather_data = json.weather_data;
+                const {weather, main} = weather_data;
+                const {temp} = main;
+                
                 document.getElementById('temperature').textContent = temp;
                 document.getElementById('summary').textContent = weather[0].description;
-
-
+                
+                
+                air = air_quality.results[0].measurements[0];
                 console.log(air);
 
                 document.getElementById('aq_parameter').textContent = air.parameter;
                 document.getElementById('aq_value').textContent = air.value;
                 document.getElementById('aq_units').textContent = air.unit;
                 document.getElementById('aq_date').textContent = air.lastUpdated;
+            } catch (error){
+                document.getElementById('aq_value').textContent = 'NO READING';
+                console.log('something went wrong!');
+                air = { value: -1 };
+                console.log(air);
+            }
 
-                // console.log(name);
-                // console.log(timezone);
-                // console.log(weather[0].description);
-                // console.log(feels_like, humidity, temp, temp_max, temp_min);
-                // console.log(main);
-                // console.log(json);
-
-                //Fetch the data
-                const data = {lat, lon, weather_data, air_quality};
-                const options = {
-                    method:'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                };
-                const response = await fetch('/api', options);
-                const json = await response.json();
-                console.log(json);
-                } catch (error){
-                    document.getElementById('aq_value').textContent = 'NO READING';
-                    console.log('something went wrong!');
-                }
+            //Fetch the data
+            const data = {lat, lon, weather_data, air};
+            const options = {
+                method:'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            };
+            const db_response = await fetch('/api', options);
+            const db_json = await db_response.json();
+            console.log(db_json);
+            console.log(data);
             });
         } else {
             console.log("Geolocation is not avaliable");
