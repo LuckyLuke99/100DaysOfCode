@@ -1,0 +1,22 @@
+{
+  "name": "learning_api",
+  "version": "1.0.0",
+  "description": "This is a project for learning using the api of steam",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "example",
+    "data",
+    "steam"
+  ],
+  "author": "Lucas da Silva",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nedb": "^1.8.0",
+    "node-fetch": "^2.6.1",
+    "nodemon": "^2.0.7"
+  }
+}
