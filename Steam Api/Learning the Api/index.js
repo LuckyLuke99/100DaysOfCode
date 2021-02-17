@@ -5,6 +5,8 @@ const express = require('express');
 const Datastore = require('nedb');
 const fetch = require('node-fetch');
 require('dotenv').config();
+var html2json = require('html2json').html2json;
+var json2html = require('html2json').json2html;
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -41,4 +43,24 @@ app.get('/news', async (request, response) => {
     const news_data = await news_response.json();
 
     response.json(news_data);
+})
+
+app.get('/csgoitems', async (request, response) => {
+    let itemStart = 0;
+    let csgo_data = new Set();
+    let csgoData; 
+    for (var i = 0; i < 1; i++){
+        const csgo_URL = `https://steamcommunity.com/market/search/render/?search_descriptions=0&sort_column=name&sort_dir=desc&appid=730&norender=1&count=100&start=${itemStart}`
+        const csgo_response = await fetch(csgo_URL);
+        csgoData = await csgo_response.json();
+        csgoData.results.array.forEach(element => {
+            //csgo_data.add(element);
+            console.log('adding element');
+        });
+        //csgo_data.push(await csgo_response.json());
+
+        itemStart += 100;
+        console.log(itemStart);
+    }
+    response.json(csgo_data);
 })
