@@ -44,23 +44,40 @@ app.get('/news', async (request, response) => {
 app.get('/csgoitems', async (request, response) => {
     let itemStart = 0;
     const csgo_data = [];
-    let num = 0;
-    let num2 = 100;
-    let csgoData; 
-    for (var i = 0; i < 2; i++){
-        const csgo_URL = `https://steamcommunity.com/market/search/render/?search_descriptions=0&sort_column=name&sort_dir=desc&appid=730&norender=1&count=50&start=${itemStart}`
-        const csgo_response = await fetch(csgo_URL);
-        csgoData = await csgo_response.json();
-        for (item of csgoData.results){
-            csgo_data.push(item);
+    const csgo_colletion = 'nuke';
+    const item_count = 1;
+    let csgo_loop = true;
+    let csgoData;
+    let tamanho;
+
+    while(csgo_loop){
+        const csgo_URL = `https://steamcommunity.com/market/search/render/?search_descriptions=0&sort_column=name&sort_dir=desc&appid=730&norender=1&count=${item_count}&start=${itemStart}&&category_730_ItemSet%5B%5D=tag_set_${csgo_colletion}`
+        while(true){
+            const csgo_response = fetch(csgo_URL).then(
+                success => {
+                    csgoData = csgo_response.json();
+                    console.log(csgoData);
+                    for (item of csgoData.results){
+                        csgo_data.push(item);
+                    }
+                    itemStart += item_count;
+                    console.log(itemStart);
+                    if(csgoData.results.length != item_count){
+                        csgo_loop = false;
+                    }
+                },
+                fail =>{
+                    console.log('Fail');
+                    console.log(fail);
+                    csgo_loop = false;
+                }
+            );
         }
-        itemStart += 100;
-        console.log(itemStart);
     }
+
     const data = {
         csgo_data: csgo_data,
         csgoData: csgoData
     }
-    console.log(csgo_data);
     response.json(data);
 })
