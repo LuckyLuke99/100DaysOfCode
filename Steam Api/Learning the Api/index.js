@@ -27,8 +27,8 @@ app.get('/database', (request, response) => {
     });
 });
 
-app.get('/update_Items/:colletion', async (response) => {
-    const item_colletion = colletion;
+app.get('/update_items/:colletion', async (request, response) => {
+    const item_colletion = request.params.colletion;
     const item_count = 100;
     const item_data = [];
     
@@ -37,8 +37,8 @@ app.get('/update_Items/:colletion', async (response) => {
     let item_loop = true;
     while(item_loop){
         const item_url = `https://steamcommunity.com/market/search/render/?search_descriptions=0&sort_column=name&sort_dir=desc&appid=730&norender=1&count=${item_count}&start=${item_start}&category_730_ItemSet%5B%5D=tag_set_${item_colletion}`
-        const item_response = fetch(item_url);
-        temp_data = item_response.json();
+        const item_response = await fetch(item_url);
+        temp_data = await item_response.json();
         
         for (item of temp_data.results){
             item_data.push(item);
@@ -56,52 +56,3 @@ app.get('/update_Items/:colletion', async (response) => {
     }
     response.json(data);
 })
-
-async function getting_data(){
-    const item_url = `https://steamcommunity.com/market/search/render/?search_descriptions=0&sort_column=name&sort_dir=desc&appid=730&norender=1&count=${item_count}&start=${item_start}&category_730_ItemSet%5B%5D=tag_set_${item_colletion}`
-    const item_response = fetch(item_url);
-    temp_data = item_response.json();
-    for (item of temp_data.results){
-        item_data.push(item);
-    }
-}
-/* app.get('/csgoitems', async (request, response) => {
-    let itemStart = 0;
-    const csgo_data = [];
-    const csgo_colletion = 'nuke';
-    const item_count = 1;
-    let csgo_loop = true;
-    let csgoData;
-    let tamanho;
-
-    while(csgo_loop){
-        const csgo_URL = `https://steamcommunity.com/market/search/render/?search_descriptions=0&sort_column=name&sort_dir=desc&appid=730&norender=1&count=${item_count}&start=${itemStart}&&category_730_ItemSet%5B%5D=tag_set_${csgo_colletion}`
-        while(true){
-            const csgo_response = fetch(csgo_URL).then(
-                success => {
-                    csgoData = csgo_response.json();
-                    console.log(csgoData);
-                    for (item of csgoData.results){
-                        csgo_data.push(item);
-                    }
-                    itemStart += item_count;
-                    console.log(itemStart);
-                    if(csgoData.results.length != item_count){
-                        csgo_loop = false;
-                    }
-                },
-                fail =>{
-                    console.log('Fail');
-                    console.log(fail);
-                    csgo_loop = false;
-                }
-            );
-        }
-    }
-
-    const data = {
-        csgo_data: csgo_data,
-        csgoData: csgoData
-    }
-    response.json(data);
-}) */
