@@ -7,8 +7,6 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-const api_key = process.env.API_KEY;
-
 app.listen(port, () => {
     console.log(`Starting server at ${port}`);
 })
@@ -29,19 +27,45 @@ app.get('/database', (request, response) => {
     });
 });
 
-app.get('/news', async (request, response) => {
-    const appid = 440;
-    const news_maxL = 0;
-    const news_count = 4;
+app.get('/update_Items/:colletion', async (response) => {
+    const item_colletion = colletion;
+    const item_count = 100;
+    const item_data = [];
+    
+    let temp_data;
+    let item_start = 0;
+    let item_loop = true;
+    while(item_loop){
+        const item_url = `https://steamcommunity.com/market/search/render/?search_descriptions=0&sort_column=name&sort_dir=desc&appid=730&norender=1&count=${item_count}&start=${item_start}&category_730_ItemSet%5B%5D=tag_set_${item_colletion}`
+        const item_response = fetch(item_url);
+        temp_data = item_response.json();
+        
+        for (item of temp_data.results){
+            item_data.push(item);
+        }
+        item_start += item_count; 
+        console.log(item_start);
+        if(temp_data.results.length != item_count){
+            item_loop = false;
+        } 
+    }
 
-    const news_URL = `https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=${appid}&${news_maxL}&${news_count}&format=json`;
-    const news_response = await fetch(news_URL);
-    const news_data = await news_response.json();
-
-    response.json(news_data);
+    const data = {
+        item_data: item_data,
+        temp_data: temp_data
+    }
+    response.json(data);
 })
 
-app.get('/csgoitems', async (request, response) => {
+async function getting_data(){
+    const item_url = `https://steamcommunity.com/market/search/render/?search_descriptions=0&sort_column=name&sort_dir=desc&appid=730&norender=1&count=${item_count}&start=${item_start}&category_730_ItemSet%5B%5D=tag_set_${item_colletion}`
+    const item_response = fetch(item_url);
+    temp_data = item_response.json();
+    for (item of temp_data.results){
+        item_data.push(item);
+    }
+}
+/* app.get('/csgoitems', async (request, response) => {
     let itemStart = 0;
     const csgo_data = [];
     const csgo_colletion = 'nuke';
@@ -80,4 +104,4 @@ app.get('/csgoitems', async (request, response) => {
         csgoData: csgoData
     }
     response.json(data);
-})
+}) */
