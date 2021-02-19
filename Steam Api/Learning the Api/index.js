@@ -29,14 +29,27 @@ app.get('/database', (request, response) => {
 
 app.get('/update_items/:colletion', async (request, response) => {
     const item_colletion = request.params.colletion;
+
+    const data = await items_loop();
+    response.json(data);
+})
+
+async function getting_items(item_count, item_start, item_colletion){
+    const item_url = `https://steamcommunity.com/market/search/render/?&currency=7&search_descriptions=0&sort_column=name&sort_dir=desc&appid=730&norender=1&count=${item_count}&start=${item_start}&category_730_ItemSet%5B%5D=tag_set_${item_colletion}`
+    const item_response = await fetch(item_url);
+    temp_data = await item_response.json();
+
+    return temp_data;
+}
+
+async function items_loop(){
+    const item_colletion = 'nuke';
     const item_count = 50;
     const item_data = [];
-    const interval_time = 3000;
 
     let item_start = 0;
     let item_loop = true;
-
-    while(item_loop){
+    do {
         const temp_data = await getting_items(item_count, item_start, item_colletion);
         for (item of temp_data.results){
             item_data.push(item);
@@ -47,18 +60,7 @@ app.get('/update_items/:colletion', async (request, response) => {
             item_loop = false;
         }
     }
+    while(item_loop);
 
-    const data = {
-        item_data: item_data,
-        temp_data: temp_data
-    }
-    response.json(data);
-})
-
-async function getting_items(item_count, item_start, item_colletion){
-    const item_url = `https://steamcommunity.com/market/search/render/?&currency=7&search_descriptions=0&sort_column=name&sort_dir=desc&appid=730&norender=1&count=${item_count}&start=${item_start}&category_730_ItemSet%5B%5D=tag_set_${item_colletion}`
-    const item_response = await fetch(item_url);
-    temp_data = await item_response.json();
-
-    return temp_data;
+    return item_data;
 }
