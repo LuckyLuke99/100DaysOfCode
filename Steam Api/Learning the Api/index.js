@@ -29,14 +29,16 @@ app.get('/database', (request, response) => {
 
 app.get('/update_items/:colletion', async (request, response) => {
     const item_colletion = request.params.colletion;
-    const item_count = 100;
+    const item_count = 50;
     const item_data = [];
     
     let temp_data;
     let item_start = 0;
     let item_loop = true;
+
+    setInterval()
     while(item_loop){
-        const item_url = `https://steamcommunity.com/market/search/render/?search_descriptions=0&sort_column=name&sort_dir=desc&appid=730&norender=1&count=${item_count}&start=${item_start}&category_730_ItemSet%5B%5D=tag_set_${item_colletion}`
+        const item_url = `https://steamcommunity.com/market/search/render/?&currency=7&search_descriptions=0&sort_column=name&sort_dir=desc&appid=730&norender=1&count=${item_count}&start=${item_start}&category_730_ItemSet%5B%5D=tag_set_${item_colletion}`
         const item_response = await fetch(item_url);
         temp_data = await item_response.json();
         
