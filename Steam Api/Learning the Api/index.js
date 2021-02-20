@@ -1,6 +1,5 @@
 const { request, response } = require('express');
 const express = require('express');
-const Datastore = require('nedb');
 const fetch = require('node-fetch');
 require('dotenv').config();
 
@@ -13,10 +12,12 @@ app.listen(port, () => {
 app.use(express.static('public'));
 app.use(express.json({limit: '1mb'}));
 
+// Creating database
+const Datastore = require('nedb');
 const database = new Datastore('database.db');
 database.loadDatabase();
 
-//Getting the data of database
+// Getting the data of database
 app.get('/database', (request, response) => {
     database.find({}, (err, data) =>{
         if(err){
@@ -30,10 +31,11 @@ app.get('/database', (request, response) => {
 // Passing the data for the cliente 
 app.get('/update_items/:colletion', async (request, response) => {
     try{
-        const item_colletion = request.params.colletion;
-        const data = await items_loop();
+        const data_response = await items_loop();
+        const data = await data_response;
+        
+        console.log(data);
         response.json(data);
-
     }catch (error){
         console.log('Erro in the update_items')
         console.error(error);
@@ -41,48 +43,46 @@ app.get('/update_items/:colletion', async (request, response) => {
 })
 
 // Getting items from steam market, can only request 100 items 
-async function getting_items(item_count, item_start, item_colletion){
+async function getItems(count, start, colletion){
     try{
-        const item_url = `https://steamcommunity.com/market/search/render/?&currency=7&search_descriptions=0&sort_column=name&sort_dir=desc&appid=730&norender=1&count=${item_count}&start=${item_start}&category_730_ItemSet%5B%5D=tag_set_${item_colletion}`
-        const item_response = await fetch(item_url);
-        temp_data = await item_response.json();
-        
-        return temp_data;
+        const response = await fetch(`https://steamcommunity.com/market/search/render/?&currency=7&search_descriptions=0&sort_column=name&sort_dir=desc&appid=730&norender=1&count=${count}&start=${start}&category_730_ItemSet%5B%5D=tag_set_${colletion}`);
+        const data = await response.json();
+        return data;
     }catch (error){
         console.log('Error in the getting_items');
         console.error(error);
     }
 }
-
 // Looping for passing temp_data for the item_data
 async function items_loop(){
     try{
         const item_colletion = 'nuke';
-        const item_count = 1;
+        const item_count = 50;
         const item_data = [];
-    
+        
         let item_start = 0;
-        let item_loop = true;
-        do {
-            const temp_data = await getting_items(item_count, item_start, item_colletion);
+        let temp_data;
+        let intervalID = setInterval(async() => {
+            temp_data = await getItems(item_count, item_start, item_colletion);
+            console.log(temp_data);
             if(temp_data != null){
                 for (item of temp_data.results){
                     item_data.push(item);
                 }
                 item_start += item_count; 
                 console.log(item_start);
+
                 if(temp_data.results.length != item_count){
-                    item_loop = false;
+                    console.log('Finishing loop');
+                    clearInterval(intervalID);
+                    return item_data;
                 }
             }
             else{
                 console.log('temp_data is null');
-                item_loop = false;
+                clearInterval(intervalID);
             }
-        }
-        while(item_loop);
-        
-        return item_data;
+        }, 3000);
     }catch (error){
         console.log('Error in the items_loop');
         console.error(error);
