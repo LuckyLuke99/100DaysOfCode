@@ -53,38 +53,47 @@ async function getItems(count, start, colletion){
         console.error(error);
     }
 }
+
 // Looping for passing temp_data for the item_data
 async function items_loop(){
     try{
         const item_colletion = 'nuke';
-        const item_count = 50;
+        const item_count = 100;
         const item_data = [];
         
         let item_start = 0;
         let temp_data;
-        let intervalID = setInterval(async() => {
-            temp_data = await getItems(item_count, item_start, item_colletion);
-            console.log(temp_data);
-            if(temp_data != null){
-                for (item of temp_data.results){
-                    item_data.push(item);
-                }
-                item_start += item_count; 
-                console.log(item_start);
+        temp_data = await getItems(item_count, item_start, item_colletion);
+        console.log(temp_data);
+        if(temp_data != null){
+            for (item of temp_data.results){
+                item_data.push(item);
+            }
+            item_start += item_count; 
+            console.log(item_start);
+            if(temp_data.results.length != item_count){
+                console.log('Finishing loop');
+                return item_data;
+            }
+        }
+        else{
+            console.log('temp_data is null');
+        }
 
-                if(temp_data.results.length != item_count){
-                    console.log('Finishing loop');
-                    clearInterval(intervalID);
-                    return item_data;
-                }
-            }
-            else{
-                console.log('temp_data is null');
-                clearInterval(intervalID);
-            }
-        }, 3000);
     }catch (error){
         console.log('Error in the items_loop');
         console.error(error);
+    }
+}
+
+function addItems(array1, array2){
+    if(array1 != null){
+        for(item of array1){
+            array2.push(item);
+        }
+        return array2;
+    }
+    else{
+        console.log('Array is nulll!');
     }
 }
