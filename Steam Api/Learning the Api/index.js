@@ -1,6 +1,7 @@
 const { request, response } = require('express');
 const express = require('express');
 const fetch = require('node-fetch');
+const Datastore = require('nedb');
 require('dotenv').config();
 
 const app = express();
@@ -13,9 +14,8 @@ app.use(express.static('public'));
 app.use(express.json({limit: '1mb'}));
 
 // Creating database
-const Datastore = require('nedb');
-const database = new Datastore('database.db');
-database.loadDatabase();
+db = {};
+db.loadDatabase();
 
 // Getting the data of database
 app.get('/database', (request, response) => {
@@ -44,8 +44,9 @@ app.get('/update_items/:colletion', async (request, response) => {
             if(results.length != count){
                 clearInterval(interval);
                 response.json(data);
+                updateDatabase(data, 'nuke');
             }
-        }, 12001)
+        }, 1000);
     }catch (error){
         console.log('Erro in the update_items')
         console.error(error);
@@ -74,4 +75,24 @@ function addItems(array1, array2){
     else{
         console.log('Array is nulll!');
     }
+}
+
+function updateDatabase(data, colletion){
+    console.log('Starting the update of database');
+    for(let i = 0; i < data.length; i++){
+        const item = data[i].name.split('|');
+        if(typeof item[1] == 'undefined'){
+            const database = new Datastore(`database/${colletion}/${item[0]}`);
+            database.insert(data[i]);
+            console.log(`Adding ${item[0]} to database`);
+            database.loadDatabase(); 
+        }
+        else{
+            const database = new Datastore(`database/${colletion}/${item[0]}/${item[1]}`);
+            database.insert(data[i]);
+            console.log(`Adding ${item[0]}|${item[1]} to database`);
+            database.loadDatabase();
+        }
+    }
+    console.log('Finish');
 }
