@@ -31,11 +31,21 @@ app.get('/database', (request, response) => {
 // Passing the data for the cliente 
 app.get('/update_items/:colletion', async (request, response) => {
     try{
-        const data_response = await items_loop();
-        const data = await data_response;
-        
-        console.log(data);
-        response.json(data);
+        let data = []
+        let start = 0;
+        let results;
+        const count = 100; 
+        const interval = setInterval(async () => {
+            const temp_data = await getItems(count, start, 'nuke');
+            results = await temp_data.results;
+            data = await addItems(results, data);
+            start += count;
+            console.log(start);
+            if(results.length != count){
+                clearInterval(interval);
+                response.json(data);
+            }
+        }, 12001)
     }catch (error){
         console.log('Erro in the update_items')
         console.error(error);
@@ -96,4 +106,13 @@ function addItems(array1, array2){
     else{
         console.log('Array is nulll!');
     }
+}
+
+function uptadeArray(){
+    let start = 0;
+    const count = 100;
+}
+
+async function delay(ms){
+    return await new Promise(resolve => setTimeout(resolve, ms));
 }
