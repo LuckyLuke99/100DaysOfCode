@@ -37,7 +37,7 @@ app.get('/update_items/:colletion', async (request, response) => {
         let temp_data;
         const count = 100; 
         let interval = setInterval(async () => {
-            temp_data = await getItems(count, start, 'nuke');
+            temp_data = await getItems(count, start, 'community_27');
             results = await temp_data.results;
             data = await addItems(results, data);
             start += count;
@@ -45,7 +45,7 @@ app.get('/update_items/:colletion', async (request, response) => {
             if(results.length != count){
                 clearInterval(interval);
                 response.json(data);
-                updateDatabase(data, 'nuke');
+                updateDatabase(data, 'community_27');
                 return;
             }
         }, 1000);
@@ -84,8 +84,9 @@ function updateDatabase(data, colletion){
         console.log('Starting the update of database');
         for(let i = 0; i < data.length; i++){
             const item = data[i].name.split('|');
+            const type = getType(data);
             if(!(isSouvenir(item[0])) && !(isUndefined(item[1]))){
-                const database = new Datastore(`database/${colletion}/${item[0]}/${item[1]}`);
+                const database = new Datastore(`database/${colletion}/${type}/${item[0]}/${item[1]}`);
                 database.insert(data[i]);
                 console.log(`Adding ${item[0]}|${item[1]} to database`);
                 database.loadDatabase();
@@ -101,7 +102,23 @@ function updateDatabase(data, colletion){
 //Fazer com que as pastas fiquem separadas  por database/colletionn/rarity
 //Colcoar em um arquivo só que fica mais fácil de retornar depois
 //Fazer com que só seja colocado armas que sejam possíveis de troca
-
+function getType(item){
+    const item_temp = item.asset_description.type;
+    const types = [
+        isCovert(item_temp),
+        isClassified(item_temp),      
+        isRestricted(item_temp),
+        isMilSpec(item_temp),
+        isIndustrial(item_temp),
+        isConsumer(item_temp)
+    ]
+    for (type in types){
+        if(type !== false){
+            console.log(type);
+            return type;
+        }
+    }
+}
 // Check if is...
 function isSouvenir(item){
     search = item.search('Souvenir')
@@ -115,6 +132,69 @@ function isSouvenir(item){
 function isUndefined(item){
     if(typeof item == 'undefined'){
         return true;
+    }
+    else{
+        return false;
+    }
+}
+function isStatTrack(item){
+    search = item.search('StatTrak™');
+    if(search !== -1){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+function isCovert(item){
+    search = item.search('Covert');
+    if(search !== -1){
+        return 'Covert';
+    }
+    else{
+        return false;
+    }
+}
+function isClassified(item){
+    search = item.search('Classified');
+    if(search !== -1){
+        return 'Classified';
+    }
+    else{
+        return false;
+    }
+}
+function isRestricted(item){
+    search = item.search('Restricted');
+    if(search !== -1){
+        return 'Restricted';
+    }
+    else{
+        return false;
+    }
+}
+function isMilSpec(item){
+    search = item.search('Mil-Spec');
+    if(search !== -1){
+        return 'Mil-Spec';
+    }
+    else{
+        return false;
+    }
+}
+function isIndustrial(item){
+    search = item.search('Industrial');
+    if(search !== -1){
+        return 'Industrial';
+    }
+    else{
+        return false;
+    }
+}
+function isConsumer(item){
+    search = item.search('Consumer');
+    if(search !== -1){
+        return 'Consumer';
     }
     else{
         return false;
