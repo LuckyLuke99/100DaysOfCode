@@ -84,7 +84,7 @@ function updateDatabase(data, colletion){
         console.log('Starting the update of database');
         for(let i = 0; i < data.length; i++){
             const item = data[i].name.split('|');
-            const type = getType(data);
+            const type = getType(data[i]);
             if(!(isSouvenir(item[0])) && !(isUndefined(item[1]))){
                 const database = new Datastore(`database/${colletion}/${type}/${item[0]}/${item[1]}`);
                 database.insert(data[i]);
@@ -111,13 +111,12 @@ function getType(item){
         isMilSpec(item_temp),
         isIndustrial(item_temp),
         isConsumer(item_temp)
-    ]
-    for (type in types){
+    ];
+    types.forEach(type =>{
         if(type !== false){
-            console.log(type);
             return type;
         }
-    }
+    });
 }
 // Check if is...
 function isSouvenir(item){
