@@ -14,8 +14,8 @@ app.use(express.static('public'));
 app.use(express.json({limit: '1mb'}));
 
 // Creating database
-db = {};
-db.loadDatabase();
+/* db = {};
+db.loadDatabase(); */
 
 // Getting the data of database
 app.get('/database', (request, response) => {
@@ -34,9 +34,10 @@ app.get('/update_items/:colletion', async (request, response) => {
         let data = []
         let start = 0;
         let results;
+        let temp_data;
         const count = 100; 
-        const interval = setInterval(async () => {
-            const temp_data = await getItems(count, start, 'nuke');
+        let interval = setInterval(async () => {
+            temp_data = await getItems(count, start, 'nuke');
             results = await temp_data.results;
             data = await addItems(results, data);
             start += count;
@@ -45,10 +46,11 @@ app.get('/update_items/:colletion', async (request, response) => {
                 clearInterval(interval);
                 response.json(data);
                 updateDatabase(data, 'nuke');
+                return;
             }
         }, 1000);
     }catch (error){
-        console.log('Erro in the update_items')
+        console.log('Erro in the updateItems')
         console.error(error);
     }
 })
@@ -60,7 +62,7 @@ async function getItems(count, start, colletion){
         const data = await response.json();
         return data;
     }catch (error){
-        console.log('Error in the getting_items');
+        console.log('Error in the getItems');
         console.error(error);
     }
 }
@@ -78,21 +80,43 @@ function addItems(array1, array2){
 }
 
 function updateDatabase(data, colletion){
-    console.log('Starting the update of database');
-    for(let i = 0; i < data.length; i++){
-        const item = data[i].name.split('|');
-        if(typeof item[1] == 'undefined'){
-            const database = new Datastore(`database/${colletion}/${item[0]}`);
-            database.insert(data[i]);
-            console.log(`Adding ${item[0]} to database`);
-            database.loadDatabase(); 
+    try{
+        console.log('Starting the update of database');
+        for(let i = 0; i < data.length; i++){
+            const item = data[i].name.split('|');
+            if(!(isSouvenir(item[0])) && !(isUndefined(item[1]))){
+                const database = new Datastore(`database/${colletion}/${item[0]}/${item[1]}`);
+                database.insert(data[i]);
+                console.log(`Adding ${item[0]}|${item[1]} to database`);
+                database.loadDatabase();
+            }
         }
-        else{
-            const database = new Datastore(`database/${colletion}/${item[0]}/${item[1]}`);
-            database.insert(data[i]);
-            console.log(`Adding ${item[0]}|${item[1]} to database`);
-            database.loadDatabase();
-        }
+        console.log('Finish');
     }
-    console.log('Finish');
+    catch (error){
+        console.log('Error in the updateDatabase');
+        console.error(error);
+    }
+}
+//Fazer com que as pastas fiquem separadas  por database/colletionn/rarity
+//Colcoar em um arquivo só que fica mais fácil de retornar depois
+//Fazer com que só seja colocado armas que sejam possíveis de troca
+
+// Check if is...
+function isSouvenir(item){
+    search = item.search('Souvenir')
+    if(search !== -1){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+function isUndefined(item){
+    if(typeof item == 'undefined'){
+        return true;
+    }
+    else{
+        return false;
+    }
 }
