@@ -79,13 +79,16 @@ function addItems(array1, array2){
     }
 }
 
-function updateDatabase(data, colletion){
+async function updateDatabase(data, colletion){
     try{
         console.log('Starting the update of database');
         for(let i = 0; i < data.length; i++){
             const item = data[i].name.split('|');
-            const type = getType(data[i]);
-            if(!(isSouvenir(item[0])) && !(isUndefined(item[1]))){
+            const responseType = await getType(data[i]);
+            const type = await responseType;
+            console.log(await type);
+            if(isWorth(item)){
+                console.log(type);
                 const database = new Datastore(`database/${colletion}/${type}/${item[0]}/${item[1]}`);
                 database.insert(data[i]);
                 console.log(`Adding ${item[0]}|${item[1]} to database`);
@@ -99,9 +102,7 @@ function updateDatabase(data, colletion){
         console.error(error);
     }
 }
-//Fazer com que as pastas fiquem separadas  por database/colletionn/rarity
-//Colcoar em um arquivo só que fica mais fácil de retornar depois
-//Fazer com que só seja colocado armas que sejam possíveis de troca
+
 function getType(item){
     const item_temp = item.asset_description.type;
     const types = [
@@ -114,11 +115,20 @@ function getType(item){
     ];
     types.forEach(type =>{
         if(type !== false){
+            console.log(type);
             return type;
         }
     });
 }
 // Check if is...
+function isWorth(item){
+    if(!(isSouvenir(item[0])) && !(isUndefined(item[1]))){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
 function isSouvenir(item){
     search = item.search('Souvenir')
     if(search !== -1){
