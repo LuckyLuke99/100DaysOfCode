@@ -29,42 +29,56 @@ app.get('/database', (request, response) => {
 });
 
 // Passing the data for the cliente 
-app.get('/update_items/:colletion', async (request, response) => {
-    try{
-        let data = []
-        let start = 0;
-        let results;
-        let temp_data;
-        const count = 100; 
-        let interval = setInterval(async () => {
-            temp_data = await getItems(count, start, 'community_27');
-            results = await temp_data.results;
-            data = await addItems(results, data);
-            start += count;
-            console.log(start);
+app.get('/update_items/:colletion', (request, response) => {
+    let interval = setInterval(() => {
+        const data = createData('community_27');
+        response.json(data);
+/*             console.log(results.length);
+        if(!temp_data){
+            console.log('temp_data is null');
+            clearInterval(interval);
+            response.json(temp_data);
+        }
+        else{
+            for(let i = 0; length == results.length; i+=count){
+                temp_data = await getItems(count, i, 'community_27');
+                results = await temp_data.results;
+                data = await addItems(results, data);
+                console.log(i);
+            }
             if(results.length != count){
                 clearInterval(interval);
+                addDatabase(data);
                 response.json(data);
-                updateDatabase(data, 'community_27');
-                return;
             }
-        }, 1000);
-    }catch (error){
-        console.log('Erro in the updateItems')
-        console.error(error);
+        } */
+    }, 1000);
+});
+
+async function createData(colletion){
+    let count = 100;
+    let start = 0;
+    let length = count;
+    let data = [];
+    for(let i = 0; length !== count; start+=count, i++){
+        data[i] = await getItems(count, start, colletion);
+        console.log(data);
+        if(data[i].results.length !== count){
+            length = data[i].results.length;
+        }
     }
-})
+    console.log(data);
+    return data;
+}
 
 // Getting items from steam market, can only request 100 items 
 async function getItems(count, start, colletion){
-    try{
-        const response = await fetch(`https://steamcommunity.com/market/search/render/?&currency=7&search_descriptions=0&sort_column=name&sort_dir=desc&appid=730&norender=1&count=${count}&start=${start}&category_730_ItemSet%5B%5D=tag_set_${colletion}`);
-        const data = await response.json();
-        return data;
-    }catch (error){
-        console.log('Error in the getItems');
-        console.error(error);
+    const response = await fetch(`https://steamcommunity.com/market/search/render/?&currency=7&search_descriptions=0&sort_column=name&sort_dir=desc&appid=730&norender=1&count=${count}&start=${start}&category_730_ItemSet%5B%5D=tag_set_${colletion}`);
+    const data = await response.json();
+    if(!data){
+        console.log("data is null");
     }
+    return data;
 }
 
 function addItems(array1, array2){
@@ -79,14 +93,13 @@ function addItems(array1, array2){
     }
 }
 
-async function updateDatabase(data, colletion){
+function updateDatabase(data, colletion){
     try{
         console.log('Starting the update of database');
         for(let i = 0; i < data.length; i++){
             const item = data[i].name.split('|');
-            const responseType = await getType(data[i]);
-            const type = await responseType;
-            console.log(await type);
+            const responseType = getType(data[i]);
+            const type = responseType;
             if(isWorth(item)){
                 console.log(type);
                 const database = new Datastore(`database/${colletion}/${type}/${item[0]}/${item[1]}`);
@@ -103,6 +116,12 @@ async function updateDatabase(data, colletion){
     }
 }
 
+function addDatabase(data){
+        data.forEach(async element =>{
+        const responseType = await getType(element);
+    })
+}
+
 function getType(item){
     const item_temp = item.asset_description.type;
     const types = [
@@ -115,7 +134,6 @@ function getType(item){
     ];
     types.forEach(type =>{
         if(type !== false){
-            console.log(type);
             return type;
         }
     });
@@ -140,6 +158,14 @@ function isSouvenir(item){
 }
 function isUndefined(item){
     if(typeof item == 'undefined'){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+function isNull(item){
+    if(typeof item == 'null'){
         return true;
     }
     else{
